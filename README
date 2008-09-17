@@ -1,0 +1,35 @@
+========================
+syshwinfo release 2008.2
+========================
+
+This package contains a tool to find out information about a Linux system (OS
+version, CPU, HD, etc.). The tool can be used directly or as a library. Also
+supplied are a server and associated client agent that can be used to centrally
+gather information about a number of clients.
+
+Files included are:
+
+``syshwinfo.py``
+    The command-line tool and library to gather information about the system.
+
+``hwinfoserver.py``
+    XML-RPC server that listens for connections from agents and stores system information in a database.
+
+``hwinforpc.cgi``
+    CGI script for running hwinfoserver.py under a webserver.
+
+``hwinfoagent.py``
+    Agent that gathers system information and sends them to a server.
+
+``hwinfo.cgi``
+    CGI script that queries the database and returns it in CSV format.
+
+
+Installation
+============
+
+Run ``python setup.py install``, or just copy the files wherever necessary. In
+order to use the server+agent system you need to edit hwinfoserver.py to set
+the DBFILE variable to point to where you want to store the database (a single
+file in GNU DBM format). Secondly you need to edit hwinfoagent.py to point
+SERVER to the URL of your server.
