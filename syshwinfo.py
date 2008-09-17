@@ -23,7 +23,7 @@ Print out some data about hardware
 
 """
 
-version = 2.0
+version = 2008.2
 
 import os, platform, socket, sys, csv, datetime
 
