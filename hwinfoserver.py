@@ -23,7 +23,7 @@ XML-RPC server writing HW info to a DB and returns the DB.
  
 """
 
-DBFILE="/home/job/src/syshwrpc/syshw.db"
+DBFILE="syshw.db"
 
 import time
 import gdbm
@@ -50,7 +50,7 @@ class HwInfoServer:
 	(hwinfot,meth) = xmlrpclib.loads(hwinfostr)
 	hwinfo = hwinfot[0]
 	# Append date before inserting
-	hwinfo.update({'Date': time.asctime()})
+	hwinfo.update({'Date': time.time()})
 	hwinfos = pickle.dumps(hwinfo)
 	res = False
 	try:

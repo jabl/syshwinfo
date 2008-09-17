@@ -25,7 +25,7 @@ Print out some data about hardware
 
 version = 2.0
 
-import os, platform, socket, sys, csv
+import os, platform, socket, sys, csv, datetime
 
 def meminfo():
     """Get the amount of memory and swap, Mebibytes"""
@@ -133,6 +133,9 @@ def printtable(h, header):
     #else:
     #    hk.remove('Hostname')
     writer = csv.DictWriter(sys.stdout, hk, extrasaction='ignore')
+    if h.has_key('Date'):
+        d = datetime.datetime.fromtimestamp(h['Date'])
+        h['Date'] = d.isoformat()
     writer.writerow(h)
 
 if __name__=="__main__":

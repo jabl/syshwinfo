@@ -21,7 +21,9 @@ This file is part of syshwinfo.
 Agent that uploads HW info to the server.
 """
 
-SERVER = "http://diileri.hut.fi/~syshwdb/hwinforpc.cgi"
+# If you use the CGI version of the server (hwinforpc.cgi), the SERVER 
+# should be the URL of the CGI script.
+SERVER = "http://localhost:8000"
 
 import xmlrpclib, syshwinfo
 
