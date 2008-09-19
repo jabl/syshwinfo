@@ -34,6 +34,6 @@ DBFILE variable to point to where you want to store the database (a single file
 in GNU DBM format). The default is in the current directory where the server is
 run. Then run the syshwinfo.py script in agent mode, optionally giving it the
 URL of the server, e.g. ``syshwinfo.py -a -s
-http://192.168.0.1/path/to/hwinfoserver.cgi``. The default URL is
+http://192.168.0.1/path/to/hwinforpc.cgi``. The default URL is
 ``http://localhost:8000``, which is also the URL when hwinfoserver.py is
 started directly from the command line without a web server.
