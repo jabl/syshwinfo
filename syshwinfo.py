@@ -19,11 +19,11 @@ This file is part of syshwinfo.
     along with syshwinfo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-Print out some data about hardware
+Print out some data about hardware.
 
 """
 
-version = 2008.2
+version = 2008.3
 
 import os, platform, socket, sys, csv, datetime
 
@@ -138,6 +138,19 @@ def printtable(h, header):
         h['Date'] = d.isoformat()
     writer.writerow(h)
 
+def agent(server="http://localhost:8000"):
+    """Run in agent mode.
+
+    This gathers data, and sends it to a server given by the server argument.
+
+    """
+    import xmlrpclib
+    sp = xmlrpclib.ServerProxy(server)
+    try:
+        sp.puthwinfo(xmlrpclib.dumps((getallhwinfo(),)))
+    except xmlrpclib.Error, v:
+        print "ERROR occured: ", v
+
 if __name__=="__main__":
     import pprint
     from optparse import OptionParser
@@ -154,6 +167,10 @@ if __name__=="__main__":
     parser.add_option("-V", "--version", dest="version",
                       action="store_true",
                       help="Print program version.")
+    parser.add_option("-a", "--agent", dest="agent", action="store_true",
+            help="Run in agent mode, send data to server.")
+    parser.add_option("-s", "--server", dest="server", 
+            help="Server to send results to when running in agent mode.")
     (options, args) = parser.parse_args()
     if (options.header):
         printheader()
@@ -161,6 +178,11 @@ if __name__=="__main__":
         printtable(getallhwinfo(), options.verbose)
     elif (options.version):
         print version
+    elif (options.agent):
+        if (options.server):
+            agent(options.server)
+        else:
+            agent()
     else:
         pp = pprint.PrettyPrinter()
         pp.pprint(getallhwinfo())
