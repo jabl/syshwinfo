@@ -23,7 +23,7 @@ Print out some data about hardware.
 
 """
 
-version = 2008.3
+version = "2008.4"
 
 import os, platform, socket, sys, csv, datetime
 
@@ -154,30 +154,23 @@ def agent(server="http://localhost:8000"):
 if __name__=="__main__":
     import pprint
     from optparse import OptionParser
-    parser = OptionParser()
+    parser = OptionParser(version=version)
     parser.add_option("-t", "--table", dest="table",
                       action="store_true",
                       help="Write output as a CSV table")
-    parser.add_option("-v", "--verbose", dest="verbose",
+    parser.add_option("-c", "--ctitles", dest="header",
                       action="store_true",
-                      help="Write output header and hostname for table")
-    parser.add_option("-o", "--header", dest="header",
-                      action="store_true",
-                      help="Write only the table header.")
-    parser.add_option("-V", "--version", dest="version",
-                      action="store_true",
-                      help="Print program version.")
+                      help="Write table column titles. Can be used in conjunction \
+with the --table option")
     parser.add_option("-a", "--agent", dest="agent", action="store_true",
             help="Run in agent mode, send data to server.")
     parser.add_option("-s", "--server", dest="server", 
             help="Server to send results to when running in agent mode.")
     (options, args) = parser.parse_args()
-    if (options.header):
+    if (options.table):
+        printtable(getallhwinfo(), options.header)
+    elif (options.header):
         printheader()
-    elif (options.table):
-        printtable(getallhwinfo(), options.verbose)
-    elif (options.version):
-        print version
     elif (options.agent):
         if (options.server):
             agent(options.server)
