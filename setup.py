@@ -12,7 +12,7 @@ scripts.remove('setup.py')
 print scripts
 
 setup(name='syshwinfo',
-      version='2008.3',
+      version='2008.4',
       description='Utilities for gathering system information and sending them to a central server.',
       author='Janne Blomqvist',
       author_email='Janne.Blomqvist@tkk.fi',
