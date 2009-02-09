@@ -10,9 +10,10 @@ gather information about a number of clients.
 Files included are:
 
 ``syshwinfo.py`` 
-    The command-line tool and library to gather information about
-    the system. Optionally can be run in agent mode where it sends the system
-    information to a server rather than printing it to the screen.
+    The command-line tool and library to gather information about the system.
+    Optionally can be run in agent mode where it sends the system information
+    to a server rather than printing it to the screen.  Run it with the --help
+    option to see usage instructions.
 
 ``hwinfoserver.py``
     XML-RPC server that listens for connections from agents and stores system
