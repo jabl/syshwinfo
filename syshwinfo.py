@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 """
-Copyright (C) 2006, 2007, 2008 Janne Blomqvist
+Copyright (C) 2006, 2007, 2008, 2009 Janne Blomqvist
 
 This file is part of syshwinfo.
 
@@ -23,7 +23,7 @@ Print out some data about hardware.
 
 """
 
-version = "2008.4"
+version = "2009.1"
 
 import os, platform, socket, sys, csv, datetime
 
@@ -78,6 +78,14 @@ def pcidata():
     f.close()
     return pdata
 
+def serial_number():
+    """Get the serial number. Requires root access"""
+    sdata = {}
+    if os.getuid() == 0:
+        for line in os.popen('/usr/sbin/dmidecode -s system-serial-number'):
+            sdata['Serial number'] = line.strip()
+    return sdata
+
 def diskdata():
     """Get total disk size in GB."""
     p = os.popen("/bin/df -l -P")
@@ -101,6 +109,19 @@ def hostname():
     """Get hostname."""
     return {"Hostname":socket.gethostname()}
 
+def mac_address():
+    """Get the MAC address"""
+    name = socket.gethostname()
+    ip = socket.gethostbyname(name)
+    for line in os.popen('/sbin/ifconfig'):
+        s = line.split()
+        if len(s) > 3:
+            if s[3] == 'HWaddr':
+                mac = s[4]
+            elif s[2] == ip:
+                break
+    return {'MAC': mac}
+
 def getallhwinfo():
     """Get all the hw info."""
     hwinfo = meminfo()
@@ -109,12 +130,14 @@ def getallhwinfo():
     hwinfo.update(pcidata())
     hwinfo.update(distro())
     hwinfo.update(diskdata())
-    hwinfo.update(hostname())    
+    hwinfo.update(hostname())
+    hwinfo.update(serial_number())
+    hwinfo.update(mac_address())
     return hwinfo
 
 def header_fields(h=None):
     """The order of the fields in the header."""
-    hfields = ['Hostname', 'Distro', 'DistroVersion', 'Kernel', 'CPU', 'MHz', 'Arch', 'Mem (MiB)', 'Swap (MiB)', 'Disk (GB)', 'Motherboard', 'Chipset', 'Graphics']
+    hfields = ['Hostname', 'Distro', 'DistroVersion', 'Kernel', 'CPU', 'MHz', 'Arch', 'Mem (MiB)', 'Swap (MiB)', 'Disk (GB)', 'Motherboard', 'Chipset', 'Graphics', 'MAC', 'Serial number']
     if h != None:
 	if h.has_key('Date'):
 	    hfields.append('Date')
