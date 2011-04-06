@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 """
-Copyright (C) 2006, 2007, 2008, 2009 Janne Blomqvist
+Copyright (C) 2006, 2007, 2008, 2009, 2011 Janne Blomqvist
 
 This file is part of syshwinfo.
 
@@ -23,7 +23,7 @@ Print out some data about hardware.
 
 """
 
-version = "2009.1"
+version = "2011.1"
 
 import os, platform, socket, sys, csv, datetime
 
@@ -65,7 +65,11 @@ def uname():
 
 def pcidata():
     """Get some pci data."""
-    f = os.popen ("/sbin/lspci -m")
+    if os.path.isfile('/sbin/lspci'):
+        lspci = '/sbin/lspci'
+    else:
+        lspci = '/usr/bin/lspci'
+    f = os.popen (lspci + ' -m')
     pdata = {}
     for line in f.readlines():
         p = line.split("\"")
