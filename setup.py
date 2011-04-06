@@ -1,23 +1,18 @@
 #!/usr/bin/python
 
 from distutils.core import setup
-from fnmatch import fnmatch
-import os
+from glob import glob
 
-scripts = []
-for file in os.listdir('.'):
-    if fnmatch(file, '*.py') or fnmatch(file, '*.cgi'):
-        scripts.append(file)
-scripts.remove('setup.py')
-print scripts
+# Scripts whose names end in a-z or 1-9 (avoids emacs backup files)
+scripts = glob('scripts/*[a-z,1-9]')
 
 setup(name='syshwinfo',
-      version='2009.1',
+      version='2011.1',
       description='Utilities for gathering system information and sending them to a central server.',
       author='Janne Blomqvist',
       author_email='Janne.Blomqvist@tkk.fi',
       license = 'GPLv3',
-      url='http://www.fyslab.hut.fi/~/job/',
+      url='https://github.com/jabl/syshwinfo',
       scripts = scripts
      )
 

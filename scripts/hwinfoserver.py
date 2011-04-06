@@ -27,7 +27,6 @@ DBFILE="syshw.db"
 
 import time
 import gdbm
-import syshwinfo
 import xmlrpclib
 import cPickle as pickle
 
