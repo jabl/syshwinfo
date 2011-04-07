@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 """
-Copyright (C) 2008 Janne Blomqvist
+Copyright (C) 2008, 2011 Janne Blomqvist
 
 This file is part of syshwinfo.
 
@@ -35,11 +35,13 @@ def getdb():
     res = []
     try:
 	db = gdbm.open(DBFILE, "r")
+    except:
+        pass
+    else:
 	k = db.firstkey()
 	while k != None:
 	    res.append(pickle.loads(db[k]))
 	    k = db.nextkey(k)
-    finally:
 	db.close()
     return res
 
@@ -51,14 +53,14 @@ class HwInfoServer:
 	# Append date before inserting
 	hwinfo.update({'Date': time.time()})
 	hwinfos = pickle.dumps(hwinfo)
-	res = False
 	try:
 	    db = gdbm.open(DBFILE, "c", 0600)
+        except:
+            return False
+        else:
 	    db[hwinfo["Hostname"]] = hwinfos
-	    res = True
-	finally:
 	    db.close()
-	return res
+	return True
 
     def gethwinfo(self):
 	"""Return the entire HW database"""
