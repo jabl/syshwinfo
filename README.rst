@@ -1,5 +1,5 @@
 ========================
-syshwinfo release 2011.2
+syshwinfo release 2011.3
 ========================
 
 This package contains a tool to find out information about a Linux system (OS
@@ -29,12 +29,13 @@ Files included are:
 Installation
 ============
 
-Run ``python setup.py install``, or just copy the files wherever necessary. In
-order to use the server+agent system you can edit hwinfoserver.py to set the
-DBFILE variable to point to where you want to store the database (a single file
-in GNU DBM format). The default is in the current directory where the server is
-run. Then run the syshwinfo.py script in agent mode, optionally giving it the
-URL of the server, e.g. ``syshwinfo.py -a -s
+Run ``python setup.py install``, or just copy the files wherever
+necessary. In order to use the server+agent system you can edit
+hwinfoserver.py to set the DBFILE variable to point to where you want
+to store the database (a single file in sqlite 3.x format). The
+default is in the current directory where the server is run. Then run
+the syshwinfo.py script in agent mode, optionally giving it the URL of
+the server, e.g. ``syshwinfo.py -a -s
 http://192.168.0.1/path/to/hwinforpc.cgi``. The default URL is
-``http://localhost:8000``, which is also the URL when hwinfoserver.py is
-started directly from the command line without a web server.
+``http://localhost:8000``, which is also the URL when hwinfoserver.py
+is started directly from the command line without a web server.

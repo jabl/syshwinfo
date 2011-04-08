@@ -23,6 +23,10 @@ This file is the CGI version of the RPC server
 
 import DocXMLRPCServer
 import hwinfoserver
+import os.path
+
+if not os.path.isfile(hwinfoserver.DBFILE):
+    hwinfoserver.createdb(hwinfoserver.DBFILE)
 
 handler = DocXMLRPCServer.DocCGIXMLRPCRequestHandler()
 handler.register_introspection_functions()

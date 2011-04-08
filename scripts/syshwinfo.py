@@ -23,7 +23,7 @@ Print out some data about hardware.
 
 """
 
-version = "2011.1"
+version = "2011.3"
 
 import os, platform, socket, sys, csv, datetime
 
@@ -35,10 +35,10 @@ def meminfo():
         meml = line.split()
         if (meml[0] == "MemTotal:"):
             mem = int(meml[1])
-            hwinfo["Mem (MiB)"] = mem/1024
+            hwinfo["Mem_MiB"] = mem/1024
         elif (meml[0] == "SwapTotal:"):
             swap = int(meml[1])
-            hwinfo["Swap (MiB)"] = swap/1024
+            hwinfo["Swap_MiB"] = swap/1024
     f.close()
     return hwinfo
 
@@ -63,8 +63,8 @@ def uname():
     uname = os.uname()
     return {"Arch":uname[4], "Kernel":uname[2]}
 
-def pcidata():
-    """Get some pci data."""
+def vgadata():
+    """Get data about the graphics card."""
     if os.path.isfile('/sbin/lspci'):
         lspci = '/sbin/lspci'
     else:
@@ -74,10 +74,7 @@ def pcidata():
     for line in f.readlines():
         p = line.split("\"")
         name = p[1].strip()
-        if (name == "Host bridge"):
-            pdata["Chipset"] = p[3] + " " + p[5]
-            pdata["Motherboard"] = p[7] + " " + p[9]
-        elif (name == "VGA compatible controller"):
+        if (name == "VGA compatible controller"):
             pdata["Graphics"] = p[3] + " " + p[5]
     f.close()
     return pdata
@@ -87,8 +84,18 @@ def serial_number():
     sdata = {}
     if os.getuid() == 0:
         for line in os.popen('/usr/sbin/dmidecode -s system-serial-number'):
-            sdata['Serial number'] = line.strip()
+            sdata['Serial'] = line.strip()
     return sdata
+
+def system_model():
+    """Get manufacturer and model number."""
+    mdata = {}
+    if os.getuid() == 0:
+        for line in os.popen('/usr/sbin/dmidecode -s system-manufacturer'):
+            mdata['System_manufacturer'] = line.strip()
+        for line in os.popen('/usr/sbin/dmidecode -s system-product-name'):
+            mdata['System_product_name'] = line.strip()
+    return mdata
 
 def diskdata():
     """Get total disk size in GB."""
@@ -99,7 +106,7 @@ def diskdata():
         d = line.split()
         if ("/dev/sd" in d[0] or "/dev/hd" in d[0] or "/dev/mapper" in d[0]):
             tsize = tsize + int(d[1])
-    ddata["Disk (GB)"] = int(tsize)/1000000
+    ddata["Disk_GB"] = int(tsize)/1000000
     p.close()
     return ddata
 
@@ -131,17 +138,18 @@ def getallhwinfo():
     hwinfo = meminfo()
     hwinfo.update(cpuinfo())
     hwinfo.update(uname())
-    hwinfo.update(pcidata())
+    hwinfo.update(vgadata())
     hwinfo.update(distro())
     hwinfo.update(diskdata())
     hwinfo.update(hostname())
     hwinfo.update(serial_number())
     hwinfo.update(mac_address())
+    hwinfo.update(system_model())
     return hwinfo
 
 def header_fields(h=None):
     """The order of the fields in the header."""
-    hfields = ['Hostname', 'Distro', 'DistroVersion', 'Kernel', 'CPU', 'MHz', 'Arch', 'Mem (MiB)', 'Swap (MiB)', 'Disk (GB)', 'Motherboard', 'Chipset', 'Graphics', 'MAC', 'Serial number']
+    hfields = ['Hostname', 'Distro', 'DistroVersion', 'Kernel', 'Arch', 'CPU', 'MHz', 'Mem_MiB', 'Swap_MiB', 'Disk_GB', 'Graphics', 'MAC', 'Serial', 'System_manufacturer', 'System_product_name']
     if h != None:
 	if h.has_key('Date'):
 	    hfields.append('Date')
@@ -157,12 +165,7 @@ def printtable(h, header):
     hk = header_fields(h)
     if (header):
         printheader()
-    #else:
-    #    hk.remove('Hostname')
     writer = csv.DictWriter(sys.stdout, hk, extrasaction='ignore')
-    if h.has_key('Date'):
-        d = datetime.datetime.fromtimestamp(h['Date'])
-        h['Date'] = d.isoformat()
     writer.writerow(h)
 
 def agent(server="http://localhost:8000"):
@@ -173,8 +176,13 @@ def agent(server="http://localhost:8000"):
     """
     import xmlrpclib
     sp = xmlrpclib.ServerProxy(server)
+    hw = getallhwinfo()
+    fields = header_fields()
+    for f in fields:
+        if not f in hw:
+            hw[f] = ''
     try:
-        sp.puthwinfo(xmlrpclib.dumps((getallhwinfo(),)))
+        sp.puthwinfo(xmlrpclib.dumps((hw,)))
     except xmlrpclib.Error, v:
         print "ERROR occured: ", v
 

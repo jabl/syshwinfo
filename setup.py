@@ -7,7 +7,7 @@ from glob import glob
 scripts = glob('scripts/*[a-z,1-9]')
 
 setup(name='syshwinfo',
-      version='2011.2',
+      version='2011.3',
       description='Utilities for gathering system information and sending them to a central server.',
       author='Janne Blomqvist',
       author_email='Janne.Blomqvist@tkk.fi',

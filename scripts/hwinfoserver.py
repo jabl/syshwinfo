@@ -23,27 +23,85 @@ XML-RPC server writing HW info to a DB and returns the DB.
  
 """
 
-DBFILE="syshw.db"
+DBFILE="syshw.sq3"
 
-import time
-import gdbm
+import datetime
 import xmlrpclib
-import cPickle as pickle
+
+try:
+    import sqlite3 # Python 2.5+
+except ImportError:
+    import pysqlite2 as sqlite3 # Python < 2.5 with python-sqlite2 package
+
+
+def opendb(filename=DBFILE):
+    """Open sqlite3 db"""
+    return sqlite3.connect(
+        filename, 
+        detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
+
+def dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
 
 def getdb():
     """Return the DB as a list of dicts"""
-    res = []
     try:
-	db = gdbm.open(DBFILE, "r")
+	conn = opendb()
     except:
         pass
     else:
-	k = db.firstkey()
-	while k != None:
-	    res.append(pickle.loads(db[k]))
-	    k = db.nextkey(k)
-	db.close()
-    return res
+        conn.row_factory = dict_factory
+	c = conn.cursor()
+        c.execute('''select * from syshw order by Hostname''')
+        res = c.fetchall()
+        conn.commit()
+        c.close()
+        conn.close()
+        return res
+    return []
+
+def createdb(filename):
+    """Create the sqlite DB"""
+    conn = opendb(filename)
+    c = conn.cursor()
+    c.execute('''create table syshw (
+Hostname text primary key,
+Distro text,
+DistroVersion text,
+Kernel text,
+Arch text,
+CPU text,
+MHz integer,
+Mem_MiB integer,
+Swap_MiB integer,
+Disk_GB integer,
+Graphics text,
+MAC text,
+Serial text,
+System_manufacturer,
+System_product_name,
+Date timestamp
+)''')
+    conn.commit()
+    c.close()
+    conn.close()
+
+def add_record(conn, hwrec):
+    """insert or update record"""
+    c = conn.cursor()
+    rc = c.execute('''insert or replace into syshw (
+hostname, arch, cpu, disk_GB, distro, distroversion,
+graphics, kernel, mac, mhz, mem_MiB, swap_MiB, date, serial,
+System_manufacturer, System_product_name)
+values (:Hostname, :Arch, :CPU, :Disk_GB, :Distro,
+:DistroVersion, :Graphics, :Kernel, :MAC, :MHz, :Mem_MiB,
+:Swap_MiB, :Date, :Serial, :System_manufacturer, 
+:System_product_name)''', hwrec)
+    conn.commit()
+    c.close()
 
 class HwInfoServer:
     def puthwinfo(self, hwinfostr):
@@ -51,15 +109,14 @@ class HwInfoServer:
 	(hwinfot,meth) = xmlrpclib.loads(hwinfostr)
 	hwinfo = hwinfot[0]
 	# Append date before inserting
-	hwinfo.update({'Date': time.time()})
-	hwinfos = pickle.dumps(hwinfo)
+	hwinfo.update({'Date': datetime.datetime.now()})
 	try:
-	    db = gdbm.open(DBFILE, "c", 0600)
+	    conn = opendb()
         except:
             return False
         else:
-	    db[hwinfo["Hostname"]] = hwinfos
-	    db.close()
+	    add_record(conn, hwinfo)
+            conn.close()
 	return True
 
     def gethwinfo(self):
@@ -67,6 +124,10 @@ class HwInfoServer:
 	return xmlrpclib.dumps((getdb(),))
  
 if __name__ == '__main__':
+    import os.path
+    import time
+    if not os.path.isfile(DBFILE):
+        createdb(DBFILE)
     from DocXMLRPCServer import DocXMLRPCServer
     server = DocXMLRPCServer(("", 8000), logRequests=0)
     server.register_introspection_functions()
