@@ -1,4 +1,5 @@
 include *.py
-include *.cgi
+include scripts/*.cgi
+include scripts/*.py
 include README.rst
 include LICENSE
