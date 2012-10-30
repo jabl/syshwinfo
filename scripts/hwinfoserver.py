@@ -35,7 +35,8 @@ import xmlrpclib
 try:
     import sqlite3 # Python 2.5+
 except ImportError:
-    import pysqlite2 as sqlite3 # Python < 2.5 with python-sqlite2 package
+    # Python < 2.5 with python-sqlite2 package
+    from pysqlite2 import dbapi2 as sqlite3
 
 
 def opendb(filename=DBFILE):
