@@ -7,11 +7,11 @@ from glob import glob
 scripts = glob('scripts/*[a-z,1-9]')
 
 setup(name='syshwinfo',
-      version='2011.3',
+      version='2.0',
       description='Utilities for gathering system information and sending them to a central server.',
       author='Janne Blomqvist',
-      author_email='Janne.Blomqvist@tkk.fi',
-      license = 'GPLv3',
+      author_email='Janne.Blomqvist@aalto.fi',
+      license = 'MIT',
       url='https://github.com/jabl/syshwinfo',
       scripts = scripts
      )

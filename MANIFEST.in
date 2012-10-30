@@ -1,4 +1,4 @@
 include *.py
 include *.cgi
-include README
-include COPYING
+include README.rst
+include LICENSE

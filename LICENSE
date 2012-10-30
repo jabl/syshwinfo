@@ -1,7 +1,4 @@
-#!/usr/bin/python
-
-"""
-Copyright (c) 2008, 2012 Janne Blomqvist
+Copyright (c) 2006-2012 Janne Blomqvist
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -21,21 +18,3 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-
-CGI script to return the DB in CSV format
-"""
-
-import hwinfoserver
-import syshwinfo
-
-db = hwinfoserver.getdb()
-
-print "Content-Type: text/csv"
-print ""
-
-if len(db) > 0:
-    syshwinfo.printheader(db[0])
-
-for ent in db:
-    syshwinfo.printtable(ent, False)
