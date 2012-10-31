@@ -27,7 +27,7 @@ Print out some data about hardware.
 
 """
 
-version = "2.0"
+version = "2.1"
 
 import os, platform, socket, sys, csv, datetime
 
@@ -87,18 +87,41 @@ def serial_number():
     """Get the serial number. Requires root access"""
     sdata = {}
     if os.getuid() == 0:
-        for line in os.popen('/usr/sbin/dmidecode -s system-serial-number'):
-            sdata['Serial'] = line.strip()
+        try:
+            sdata['Serial'] = open('/sys/class/dmi/id/product_serial') \
+                .read().strip()
+        except:
+            for line in os.popen('/usr/sbin/dmidecode -s system-serial-number'):
+                sdata['Serial'] = line.strip()
     return sdata
 
 def system_model():
-    """Get manufacturer and model number."""
+    """Get manufacturer and model number.
+
+    On older Linux kernel versions without /sys/class/dmi/id this
+    requires root access.
+    """
     mdata = {}
-    if os.getuid() == 0:
-        for line in os.popen('/usr/sbin/dmidecode -s system-manufacturer'):
-            mdata['System_manufacturer'] = line.strip()
-        for line in os.popen('/usr/sbin/dmidecode -s system-product-name'):
-            mdata['System_product_name'] = line.strip()
+    man = None
+    pn = None
+    try:
+        # This might be
+        # bios_vendor, board_vendor, or chassis_vendor
+        man = open('/sys/class/dmi/id/chassis_vendor').read().strip()
+    except:
+        if os.getuid() == 0:
+            for line in os.popen('/usr/sbin/dmidecode -s system-manufacturer'):
+                man = line.strip()
+    try:
+        pn = open('/sys/class/dmi/id/product_name').read().strip()
+    except:
+        if os.getuid() == 0:
+            for line in os.popen('/usr/sbin/dmidecode -s system-product-name'):
+                pn = line.strip()
+    if man is not None:
+        mdata['System_manufacturer'] = man
+    if pn is not None:
+        mdata['System_product_name'] = pn
     return mdata
 
 def diskdata():

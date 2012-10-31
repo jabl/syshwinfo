@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='syshwinfo',
-      version='2.0',
+      version='2.1',
       description='Utilities for gathering system information and sending them to a central server.',
       author='Janne Blomqvist',
       author_email='Janne.Blomqvist@aalto.fi',

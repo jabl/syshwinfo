@@ -1,5 +1,5 @@
 =====================
-syshwinfo release 2.0
+syshwinfo release 2.1
 =====================
 
 This package contains a tool to find out information about a Linux system (OS
