@@ -73,7 +73,8 @@ def createdb(filename):
     conn = opendb(filename)
     c = conn.cursor()
     c.execute('''create table syshw (
-Hostname text primary key,
+IP text primary key,
+Hostname text,
 Distro text,
 DistroVersion text,
 Kernel text,
@@ -86,10 +87,11 @@ Disk_GB integer,
 Graphics text,
 MAC text,
 Serial text,
-System_manufacturer,
-System_product_name,
+System_manufacturer text,
+System_product_name text,
 Date timestamp
 )''')
+    c.execute('create index syshw_hostname_index on syshw (Hostname)')
     conn.commit()
     c.close()
     conn.close()
@@ -98,10 +100,10 @@ def add_record(conn, hwrec):
     """insert or update record"""
     c = conn.cursor()
     rc = c.execute('''insert or replace into syshw (
-hostname, arch, cpu, disk_GB, distro, distroversion,
+IP, hostname, arch, cpu, disk_GB, distro, distroversion,
 graphics, kernel, mac, mhz, mem_MiB, swap_MiB, date, serial,
 System_manufacturer, System_product_name)
-values (:Hostname, :Arch, :CPU, :Disk_GB, :Distro,
+values (:IP, :Hostname, :Arch, :CPU, :Disk_GB, :Distro,
 :DistroVersion, :Graphics, :Kernel, :MAC, :MHz, :Mem_MiB,
 :Swap_MiB, :Date, :Serial, :System_manufacturer, 
 :System_product_name)''', hwrec)
