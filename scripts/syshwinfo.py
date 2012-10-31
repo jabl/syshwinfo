@@ -121,13 +121,25 @@ def distro():
     return {"Distro":d[0], "DistroVersion":d[1]}
 
 def hostname():
-    """Get hostname."""
-    return {"Hostname":socket.gethostname()}
+    """Get hostname. 
 
-def mac_address():
+    Use the fqdn to get a consistent hostname, otherwise using
+    gethostname() might or might not give a fqdn depending on the
+    system configuration.
+    """
+    return {"Hostname":socket.getfqdn()}
+
+def ip_address():
+    """Get the IP address used for public connections."""
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    # 8.8.8.8 is the google public DNS
+    s.connect(("8.8.8.8", 53))
+    ip = s.getsockname()[0]
+    s.close()
+    return ip
+
+def mac_address(ip):
     """Get the MAC address"""
-    name = socket.gethostname()
-    ip = socket.gethostbyname(name)
     for line in os.popen('/sbin/ifconfig'):
         s = line.split()
         if len(s) > 3:
@@ -147,13 +159,15 @@ def getallhwinfo():
     hwinfo.update(diskdata())
     hwinfo.update(hostname())
     hwinfo.update(serial_number())
-    hwinfo.update(mac_address())
+    ip = ip_address()
+    hwinfo.update(mac_address(ip))
+    hwinfo.update({'IP': ip})
     hwinfo.update(system_model())
     return hwinfo
 
 def header_fields(h=None):
     """The order of the fields in the header."""
-    hfields = ['Hostname', 'Distro', 'DistroVersion', 'Kernel', 'Arch', 'CPU', 'MHz', 'Mem_MiB', 'Swap_MiB', 'Disk_GB', 'Graphics', 'MAC', 'Serial', 'System_manufacturer', 'System_product_name']
+    hfields = ['Hostname', 'IP', 'Distro', 'DistroVersion', 'Kernel', 'Arch', 'CPU', 'MHz', 'Mem_MiB', 'Swap_MiB', 'Disk_GB', 'Graphics', 'MAC', 'Serial', 'System_manufacturer', 'System_product_name']
     if h != None:
 	if h.has_key('Date'):
 	    hfields.append('Date')
