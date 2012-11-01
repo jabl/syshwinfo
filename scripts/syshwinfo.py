@@ -27,7 +27,7 @@ Print out some data about hardware.
 
 """
 
-version = "2.1"
+version = "2.1.1"
 
 import os, platform, socket, sys, csv, datetime
 
@@ -106,8 +106,8 @@ def system_model():
     pn = None
     try:
         # This might be
-        # bios_vendor, board_vendor, or chassis_vendor
-        man = open('/sys/class/dmi/id/chassis_vendor').read().strip()
+        # sys_vendor, bios_vendor, board_vendor, or chassis_vendor
+        man = open('/sys/class/dmi/id/sys_vendor').read().strip()
     except:
         if os.getuid() == 0:
             for line in os.popen('/usr/sbin/dmidecode -s system-manufacturer'):

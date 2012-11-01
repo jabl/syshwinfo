@@ -1,6 +1,6 @@
-=====================
-syshwinfo release 2.1
-=====================
+=======================
+syshwinfo release 2.1.1
+=======================
 
 This package contains a tool to find out information about a Linux system (OS
 version, CPU, HD, etc.). The tool can be used directly or as a library. Also
